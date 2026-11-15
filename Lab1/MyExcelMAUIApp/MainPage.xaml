@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyExcelMAUIApp.MainPage"
+             Title="MyExcel">
+
+    <ContentPage.MenuBarItems>
+        <MenuBarItem Text="Файл">
+            <MenuFlyoutItem Text="Нова таблиця" Clicked="NewButton_Clicked">
+                <MenuFlyoutItem.KeyboardAccelerators>
+                    <KeyboardAccelerator Modifiers="Ctrl" Key="N" />
+                </MenuFlyoutItem.KeyboardAccelerators>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Відкрити..." Clicked="ReadButton_Clicked">
+                <MenuFlyoutItem.KeyboardAccelerators>
+                    <KeyboardAccelerator Modifiers="Ctrl" Key="O" />
+                </MenuFlyoutItem.KeyboardAccelerators>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Зберегти" Clicked="SaveButton_Clicked">
+                <MenuFlyoutItem.KeyboardAccelerators>
+                    <KeyboardAccelerator Modifiers="Ctrl" Key="S" />
+                </MenuFlyoutItem.KeyboardAccelerators>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Зберегти як..." Clicked="SaveAsButton_Clicked" />
+            <MenuFlyoutSeparator />
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Text="Вийти" Clicked="ExitButton_Clicked" />
+        </MenuBarItem>
+
+        <MenuBarItem Text="Таблиця">
+            <MenuFlyoutItem Text="Порахувати" Clicked="CalculateButton_Clicked">
+                <MenuFlyoutItem.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="F9" />
+                </MenuFlyoutItem.KeyboardAccelerators>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Text="Додати рядок" Clicked="AddRowButton_Clicked" />
+            <MenuFlyoutItem Text="Додати стовпчик" Clicked="AddColumnButton_Clicked" />
+            <MenuFlyoutItem Text="Видалити останній рядок" Clicked="DeleteRowButton_Clicked" />
+            <MenuFlyoutItem Text="Видалити останній стовпчик" Clicked="DeleteColumnButton_Clicked" />
+        </MenuBarItem>
+
+        <MenuBarItem Text="Вигляд">
+            <MenuFlyoutItem Text="Режим ВИРАЗ" Clicked="ExpressionModeMenu_Clicked" />
+            <MenuFlyoutItem Text="Режим ЗНАЧЕННЯ" Clicked="ValueModeMenu_Clicked" />
+        </MenuBarItem>
+
+        <MenuBarItem Text="Довідка">
+            <MenuFlyoutItem Text="Довідка" Clicked="HelpButton_Clicked">
+                <MenuFlyoutItem.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="F1" />
+                </MenuFlyoutItem.KeyboardAccelerators>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Про програму" Clicked="AboutButton_Clicked" />
+        </MenuBarItem>
+    </ContentPage.MenuBarItems>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <ScrollView Grid.Row="0" Orientation="Horizontal" BackgroundColor="{StaticResource PanelBackground}">
+            <HorizontalStackLayout x:Name="ToolbarPanel" Padding="8,6" Spacing="6">
+                <Button Text="Нова" Clicked="NewButton_Clicked" ToolTipProperties.Text="Створити нову таблицю (Ctrl+N)" />
+                <Button Text="Відкрити" Clicked="ReadButton_Clicked" ToolTipProperties.Text="Відкрити таблицю з файлу (Ctrl+O)" />
+                <Button Text="Зберегти" Clicked="SaveButton_Clicked" ToolTipProperties.Text="Зберегти таблицю у файл (Ctrl+S)" />
+                <BoxView WidthRequest="1" Color="{StaticResource GridLine}" Margin="4,2" />
+                <Button Text="Порахувати" Clicked="CalculateButton_Clicked" ToolTipProperties.Text="Перерахувати всі клітинки (F9)" />
+                <Button Text="+ Рядок" Style="{StaticResource SecondaryButton}" Clicked="AddRowButton_Clicked" />
+                <Button Text="+ Стовпчик" Style="{StaticResource SecondaryButton}" Clicked="AddColumnButton_Clicked" />
+                <Button Text="− Рядок" Style="{StaticResource SecondaryButton}" Clicked="DeleteRowButton_Clicked" />
+                <Button Text="− Стовпчик" Style="{StaticResource SecondaryButton}" Clicked="DeleteColumnButton_Clicked" />
+                <BoxView WidthRequest="1" Color="{StaticResource GridLine}" Margin="4,2" />
+                <Button Text="Довідка" Style="{StaticResource SecondaryButton}" Clicked="HelpButton_Clicked" />
+                <Button Text="Вийти" Style="{StaticResource SecondaryButton}" Clicked="ExitButton_Clicked" />
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1"
+              ColumnDefinitions="Auto,Auto,*,Auto,Auto"
+              ColumnSpacing="8"
+              Padding="8,6"
+              BackgroundColor="{StaticResource PanelBackground}">
+            <Label x:Name="SelectedCellLabel"
+                   Grid.Column="0"
+                   Text="—"
+                   WidthRequest="70"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center"
+                   BackgroundColor="{StaticResource InputBackground}" />
+            <Label Grid.Column="1" Text="Вираз:" VerticalTextAlignment="Center" />
+            <Entry x:Name="FormulaEntry"
+                   Grid.Column="2"
+                   Placeholder="Виберіть клітинку та введіть вираз, наприклад: (A1 + 5) div 2"
+                   Completed="FormulaEntry_Completed" />
+            <Button Grid.Column="3" Text="Застосувати" Clicked="ApplyFormulaButton_Clicked" />
+            <HorizontalStackLayout Grid.Column="4" Spacing="4" VerticalOptions="Center">
+                <Label Text="Режим:" VerticalTextAlignment="Center" />
+                <RadioButton x:Name="ExpressionModeRadio"
+                             Content="ВИРАЗ"
+                             GroupName="DisplayMode"
+                             CheckedChanged="DisplayModeRadio_CheckedChanged" />
+                <RadioButton x:Name="ValueModeRadio"
+                             Content="ЗНАЧЕННЯ"
+                             GroupName="DisplayMode"
+                             IsChecked="True"
+                             CheckedChanged="DisplayModeRadio_CheckedChanged" />
+            </HorizontalStackLayout>
+        </Grid>
+
+        <ScrollView Grid.Row="2" Orientation="Both" BackgroundColor="{StaticResource GridLine}">
+            <Grid x:Name="SheetGrid"
+                  ColumnSpacing="0"
+                  RowSpacing="0"
+                  HorizontalOptions="Start"
+                  VerticalOptions="Start" />
+        </ScrollView>
+
+        <Grid Grid.Row="3"
+              ColumnDefinitions="Auto,*,Auto,Auto"
+              ColumnSpacing="16"
+              Padding="8,4"
+              BackgroundColor="{StaticResource StatusBarBackground}">
+            <ActivityIndicator x:Name="BusyIndicator"
+                               Grid.Column="0"
+                               IsRunning="False"
+                               IsVisible="False"
+                               Color="White"
+                               HeightRequest="18"
+                               WidthRequest="18" />
+            <Label x:Name="StatusLabel"
+                   Grid.Column="1"
+                   TextColor="White"
+                   FontSize="13"
+                   LineBreakMode="TailTruncation"
+                   Text="Готово" />
+            <Label x:Name="SizeLabel"
+                   Grid.Column="2"
+                   TextColor="White"
+                   FontSize="13" />
+            <Label Grid.Column="3"
+                   Text="Куць Андрій · К-28"
+                   TextColor="White"
+                   FontSize="13"
+                   FontAttributes="Bold" />
+        </Grid>
+    </Grid>
+</ContentPage>
